@@ -1,0 +1,6 @@
+#LIGA O REWRITE REESCRITA DE URLS
+RewriteEngine on
+
+#REGRA DE REDIRECIONAMENTO DE TUDO PARA A INDEX
+RewriteCond %{REQUEST_FILENAME}!-f
+RewriteRule ^(.*)$ ./index.php [QSA,NC]
