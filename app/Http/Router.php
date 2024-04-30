@@ -15,7 +15,7 @@ class Router
 
     public function __construct(string $url)
     {
-        $this->request = new Request();
+        $this->request = new Request($this);
         $this->url = $url;
         $this->setPrefix();
     }
@@ -187,6 +187,14 @@ class Router
         } catch (Exception $e) {
             return new Response($e->getCode(), $e->getMessage());
         }
+    }
+
+    /**
+     * MÉTODO RESPONSÁVEL POR RETORNAR A URL ATUAL
+     */
+    public function getCurrentUrl(): string
+    {
+        return $this->url.$this->getUri();
     }
 
 }
