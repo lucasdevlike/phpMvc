@@ -5,6 +5,7 @@ namespace App\Http;
 use Closure;
 use Exception;
 use ReflectionFunction;
+use App\Http\Middleware\Queue as MiddlewareQueue;
 
 class Router
 {
@@ -40,6 +41,8 @@ class Router
                 continue;
             }
         }
+        //MIDDLEWARES DA ROTA
+        $params['middlewares'] = $params['middlewares'] ?? [];
 
         //VARIAVEIS DA ROTA
         $params['variables'] = [];
@@ -104,7 +107,7 @@ class Router
      * MÉTODO RESPONSÁVEL POR RETORNAR A URI DESCONSIDERANDO O PREFIXO
      * @return string
      */
-    private function getUri(): string
+    private function getUri()
     {
         $uri = $this->request->getUri();
 
@@ -119,7 +122,7 @@ class Router
      * MÉTODO RESPONSÁVEL POR RETORNAR OS DADOS DA ROTA ATUAL
      * @return array
      */
-    private function getRoute(): array
+    private function getRoute()
     {
         //URI
         $uri = $this->getUri();
@@ -158,7 +161,7 @@ class Router
      * MÉTODO RESPONSAVEL POR EXECUTAR A ROTA ATUAL
      * @return Response
      */
-    public function run(): Response
+    public function run()
     {
         try {
             //OBTEM A ROTA ATUAL
@@ -180,9 +183,9 @@ class Router
                 $args[$name] = $route['variables'][$name] ?? '';
             }
 
-
-            //RETORNA A FUNÇÃO
-            return call_user_func_array($route['controller'], $args);
+            //RETORNA A EXECUÇÃO DA FILA DE MIDDLEWARES
+            return (new MiddlewareQueue($route['middlewares'], $route['controller'], $args))->next($this->request);
+            // return call_user_func_array($route['controller'], $args);
 
         } catch (Exception $e) {
             return new Response($e->getCode(), $e->getMessage());
