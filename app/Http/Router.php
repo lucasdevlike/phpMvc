@@ -200,4 +200,13 @@ class Router
         return $this->url.$this->getUri();
     }
 
+    public function redirect($route)
+    {
+        //URL
+        $url = $this->url.$route;
+
+        header('location: '.$url);
+        exit;
+    }
+
 }
